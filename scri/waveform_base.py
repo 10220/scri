@@ -15,6 +15,7 @@ import scipy.constants as spc
 from scipy.interpolate import CubicSpline
 from . import *
 
+
 @jit("void(c16[:,:], f8[:])")
 def complex_array_norm(c, s):
     for i in range(len(s)):
@@ -22,6 +23,7 @@ def complex_array_norm(c, s):
         for j in range(c.shape[1]):
             s[i] += c[i, j].real ** 2 + c[i, j].imag ** 2
     return
+
 
 @jit("void(c16[:,:], f8[:])")
 def complex_array_abs(c, s):
