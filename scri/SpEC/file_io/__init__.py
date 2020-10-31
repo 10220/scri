@@ -308,7 +308,7 @@ def read_from_h5(file_name, **kwargs):
 
 def write_to_h5(w, file_name, file_write_mode="w", attributes={}, use_NRAR_format=True):
     """
-    Output the Waveform to an HDF5 file. Default behavior uses the NRAR format. 
+    Output the Waveform to an HDF5 file. Default behavior uses the NRAR format.
 
     Note that the file_name is prepended with some descriptive information involving the data type and the frame type,
     such as 'rhOverM_Corotating_' or 'rMpsi4_Aligned_'.
