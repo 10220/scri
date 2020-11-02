@@ -83,17 +83,17 @@ def supermomentum(self, supermomentum_def, integrated=False):
 
     """
     if supermomentum_def.lower() in ["bondi-sachs", "bs"]:
-        supermomentum = self.psi2 + self.sigma * self.sigma.bar.dot
+        supermomentum = self.psi2 + self.sigma.grid_multiply(self.sigma.bar.dot)
     elif supermomentum_def.lower() in ["moreschi", "m"]:
-        supermomentum = self.psi2 + self.sigma * self.sigma.bar.dot + self.sigma.bar.eth_GHP.eth_GHP
+        supermomentum = self.psi2 + self.sigma.grid_multiply(self.sigma.bar.dot) + self.sigma.bar.eth_GHP.eth_GHP
     elif supermomentum_def.lower() in ["geroch", "g"]:
         supermomentum = (
             self.psi2
-            + self.sigma * self.sigma.bar.dot
+            + self.sigma.grid_multiply(self.sigma.bar.dot)
             + 0.5 * (self.sigma.bar.eth_GHP.eth_GHP - self.sigma.ethbar_GHP.ethbar_GHP)
         )
     elif supermomentum_def.lower() in ["geroch-winicour", "gw"]:
-        supermomentum = self.psi2 + self.sigma * self.sigma.bar.dot - self.sigma.ethbar_GHP.ethbar_GHP
+        supermomentum = self.psi2 + self.sigma.grid_multiply(self.sigma.bar.dot) - self.sigma.ethbar_GHP.ethbar_GHP
     else:
         raise ValueError(
             f"Supermomentum defintion '{supermomentum_def}' not recognized. Please choose one of "
