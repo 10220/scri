@@ -2,6 +2,7 @@ import numpy as np
 from spherical_functions import LM_total_size
 from .. import ModesTimeSeries
 from .. import Inertial
+from .. import sigma, psi4, psi3, psi2, psi1, psi0
 
 
 class AsymptoticBondiData:
@@ -187,6 +188,20 @@ class AsymptoticBondiData:
             new_abd.frame = quaternion.as_quat_array(new_frame)
         return new_abd
 
+    def select_data(self, dataType):
+        if dataType == sigma:
+            return self.sigma
+        elif dataType == psi4:
+            return self.psi4
+        elif dataType == psi3:
+            return self.psi3
+        elif dataType == psi2:
+            return self.psi2
+        elif dataType == psi1:
+            return self.psi1
+        elif dataType == psi0:
+            return self.psi0
+
     from .from_initial_values import from_initial_values
 
     from .constraints import (
@@ -203,4 +218,9 @@ class AsymptoticBondiData:
 
     from .transformations import transform
     from .supermomentum import supermomentum, mass_aspect, bondi_four_momentum
-    from .frame_rotations import to_inertial_frame, rotate_decomposition_basis
+    from .frame_rotations import (
+        to_inertial_frame,
+        to_corotating_frame,
+        to_coprecessing_frame,
+        rotate_decomposition_basis,
+    )
