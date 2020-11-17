@@ -59,6 +59,29 @@ def bondi_four_momentum(self):
     return four_momentum
 
 
+def spin_angular_momentum(self):
+    from spherical_functions import LM_index as lm
+    four_momentum = self.bondi_four_momentum()
+    rest_mass = four_momentum[-1, 0] ** 2 - np.sum(four_momentum[-1, 1:] ** 2)
+    Q = (
+        self.psi1
+        + self.sigma.grid_multiply(self.sigma.bar.eth_GHP)
+        + 0.5 * (self.sigma.grid_multiply(self.sigma.bar)).eth_GHP
+    ).ndarray
+    angular_momentum = np.real(
+        1j
+        / np.sqrt(24 * np.pi)
+        * np.array(
+            [
+                Q[:, lm(-1, 1, 0)] - Q[:, lm(1, 1, 0)],
+                -1j * (Q[:, lm(-1, 1, 0)] + Q[:, lm(1, 1, 0)]),
+                np.sqrt(2) * Q[:, lm(1, 0, 0)],
+            ]
+        )
+    )
+    return (angular_momentum / rest_mass).T
+
+
 def supermomentum(self, supermomentum_def, integrated=False):
     """Computes the supermomentum of the asymptotic Bondi data. Allows for several different definitions
     of the supermomentum. These differences only apply to ell > 1 modes, so they do not affect the Bondi
