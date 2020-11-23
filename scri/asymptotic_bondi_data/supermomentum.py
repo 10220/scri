@@ -59,10 +59,10 @@ def bondi_four_momentum(self):
     return four_momentum
 
 
-def spin_angular_momentum(self):
-    from spherical_functions import LM_index as lm
-    four_momentum = self.bondi_four_momentum()
-    rest_mass = four_momentum[-1, 0] ** 2 - np.sum(four_momentum[-1, 1:] ** 2)
+def bondi_angular_momentum(self):
+    """Compute the Bondi angular momentum vector via Eq. (8) in T. Dray (1985) [DOI:10.1088/0264-9381/2/1/002]"""
+    from spherical_functions import LM_index
+
     Q = (
         self.psi1
         + self.sigma.grid_multiply(self.sigma.bar.eth_GHP)
@@ -73,12 +73,23 @@ def spin_angular_momentum(self):
         / np.sqrt(24 * np.pi)
         * np.array(
             [
-                Q[:, lm(-1, 1, 0)] - Q[:, lm(1, 1, 0)],
-                -1j * (Q[:, lm(-1, 1, 0)] + Q[:, lm(1, 1, 0)]),
-                np.sqrt(2) * Q[:, lm(1, 0, 0)],
+                Q[:, LM_index(-1, 1, 0)] - Q[:, LM_index(1, 1, 0)],
+                -1j * (Q[:, LM_index(-1, 1, 0)] + Q[:, LM_index(1, 1, 0)]),
+                np.sqrt(2) * Q[:, LM_index(1, 0, 0)],
             ]
         )
     )
+    return angular_momentum
+
+
+def bondi_spin(self):
+    """Computes the Bondi spin angular momentum vector ASSUMING that the orbital part of the angular momentum
+    computed from the Bondi data is zero."""
+    from spherical_functions import LM_index as lm
+
+    four_momentum = self.bondi_four_momentum()
+    rest_mass = four_momentum[-1, 0] ** 2 - np.sum(four_momentum[-1, 1:] ** 2)
+    angular_momentum = self.bondi_angular_momentum()
     return (angular_momentum / rest_mass).T
 
 
@@ -298,7 +309,7 @@ def transform_moreschi_supermomentum(supermomentum, **kwargs):
     supermomentum_prime = spinsfast.map2salm(Ψprime_of_timeprime_directionprime, 0, output_ell_max)
     supermomentum_prime = ModesTimeSeries(
         sf.SWSH_modes.Modes(
-            supermomentum_prime, spin_weight=0, ell_min=0, ell_max=output_ell_max, multiplication_truncator=max,
+            supermomentum_prime, spin_weight=0, ell_min=0, ell_max=output_ell_max, multiplication_truncator=max
         ),
         time=timeprime,
     )

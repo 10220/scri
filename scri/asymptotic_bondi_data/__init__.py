@@ -203,9 +203,9 @@ class AsymptoticBondiData:
             return self.psi0
 
     def speciality_index(self, **kwargs):
-        """Computes the Baker-Campanelli speciality index (arXiv:gr-qc/0003031). NOTE: This quantity can only 
+        """Computes the Baker-Campanelli speciality index (arXiv:gr-qc/0003031). NOTE: This quantity can only
         determine algebraic speciality but can not determine the type! The rule of thumb given by Baker and
-        Campanelli is that for an algebraically special spacetime the speciality index should differ from unity 
+        Campanelli is that for an algebraically special spacetime the speciality index should differ from unity
         by no more than a factor of two.
 
         """
@@ -278,7 +278,7 @@ class AsymptoticBondiData:
     )
 
     from .transformations import transform
-    from .supermomentum import supermomentum, mass_aspect, bondi_four_momentum, spin_angular_momentum
+    from .supermomentum import supermomentum, mass_aspect, bondi_four_momentum, bondi_angular_momentum, bondi_spin
     from .frame_rotations import (
         to_inertial_frame,
         to_corotating_frame,
