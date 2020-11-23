@@ -202,6 +202,67 @@ class AsymptoticBondiData:
         elif dataType == psi0:
             return self.psi0
 
+    def speciality_index(self, **kwargs):
+        """Computes the Baker-Campanelli speciality index (arXiv:gr-qc/0003031). NOTE: This quantity can only 
+        determine algebraic speciality but can not determine the type! The rule of thumb given by Baker and
+        Campanelli is that for an algebraically special spacetime the speciality index should differ from unity 
+        by no more than a factor of two.
+
+        """
+
+        import spinsfast
+        import spherical_functions as sf
+        from spherical_functions import LM_index
+
+        output_ell_max = kwargs.pop("output_ell_max") if "output_ell_max" in kwargs else self.ell_max
+        working_ell_max = kwargs.pop("working_ell_max") if "working_ell_max" in kwargs else 2 * self.ell_max
+        n_theta = n_phi = 2 * working_ell_max + 1
+
+        # Transform to grid representation
+        psi4 = np.empty((self.n_times, n_theta, n_phi), dtype=complex)
+        psi3 = np.empty((self.n_times, n_theta, n_phi), dtype=complex)
+        psi2 = np.empty((self.n_times, n_theta, n_phi), dtype=complex)
+        psi1 = np.empty((self.n_times, n_theta, n_phi), dtype=complex)
+        psi0 = np.empty((self.n_times, n_theta, n_phi), dtype=complex)
+
+        for t_i in range(self.n_times):
+            psi4[t_i, :, :] = spinsfast.salm2map(
+                self.psi4.ndarray[t_i, :], self.psi4.spin_weight, lmax=self.ell_max, Ntheta=n_theta, Nphi=n_phi
+            )
+            psi3[t_i, :, :] = spinsfast.salm2map(
+                self.psi3.ndarray[t_i, :], self.psi3.spin_weight, lmax=self.ell_max, Ntheta=n_theta, Nphi=n_phi
+            )
+            psi2[t_i, :, :] = spinsfast.salm2map(
+                self.psi2.ndarray[t_i, :], self.psi2.spin_weight, lmax=self.ell_max, Ntheta=n_theta, Nphi=n_phi
+            )
+            psi1[t_i, :, :] = spinsfast.salm2map(
+                self.psi1.ndarray[t_i, :], self.psi1.spin_weight, lmax=self.ell_max, Ntheta=n_theta, Nphi=n_phi
+            )
+            psi0[t_i, :, :] = spinsfast.salm2map(
+                self.psi0.ndarray[t_i, :], self.psi0.spin_weight, lmax=self.ell_max, Ntheta=n_theta, Nphi=n_phi
+            )
+
+        curvature_invariant_I = psi4 * psi0 - 4 * psi3 * psi1 + 3 * psi2 ** 2
+        curvature_invariant_J = (
+            psi4 * (psi2 * psi0 - psi1 ** 2) - psi3 * (psi3 * psi0 - psi1 * psi2) + psi2 * (psi3 * psi1 - psi2 ** 2)
+        )
+        speciality_index = 27 * curvature_invariant_J ** 2 / curvature_invariant_I ** 3
+
+        # Transform back to mode representation
+        speciality_index_modes = np.empty((self.n_times, (working_ell_max) ** 2), dtype=complex)
+        for t_i in range(self.n_times):
+            speciality_index_modes[t_i, :] = spinsfast.map2salm(speciality_index[t_i, :], 0, lmax=working_ell_max - 1)
+
+        # Convert product ndarray to a ModesTimeSeries object
+        speciality_index_modes = speciality_index_modes[:, : LM_index(output_ell_max, output_ell_max, 0) + 1]
+        speciality_index_modes = ModesTimeSeries(
+            sf.SWSH_modes.Modes(
+                speciality_index_modes, spin_weight=0, ell_min=0, ell_max=output_ell_max, multiplication_truncator=max
+            ),
+            time=self.t,
+        )
+        return speciality_index_modes
+
     from .from_initial_values import from_initial_values
 
     from .constraints import (
